@@ -7,7 +7,8 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     protected MapVisualizer visualizer = new MapVisualizer(this);
     protected Vector2d upperRight;
     protected Vector2d lowerLeft;
-    protected int plantEnergy=10;
+    protected int plantEnergy = 10;
+    protected int startEnergy = 20;
 
 
     @Override
@@ -43,7 +44,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         if (animals.get(newPosition) == null){
             LinkedList<Animal> listOfAnimals = new LinkedList<>();
             listOfAnimals.add(animal);
-            animals.put(newPosition,listOfAnimals); //? rly
+            animals.put(newPosition,listOfAnimals);
         }
         else{
             animals.get(newPosition).add(animal);
@@ -68,36 +69,53 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         this.addAnimalToAnimals(animal,newPosition);
     }
 
-    public Animal animalWooHoo(Vector2d position){ // assumes that there's at least 2 animals on the position, musi byc tez minimalna ilosc energii
-        LinkedList<Animal> potentialParents = animals.get(position);
-        List<Integer>mamasPart;
-        List<Integer>tatasPart;
+    public void animalWooHoo(List<Animal> animals){
+        Animal mum = animals.get(0);
+        Animal dad = animals.get(1);
+        List<Integer>mumsPart;
+        List<Integer>dadsPart;
         List<Integer> babysGenotype;
         Random random = new Random();
 
-        potentialParents.sort(new energyComparator());
-        Animal mama = potentialParents.get(0);
-        Animal tata = potentialParents.get(1);
-        Animal baby = new Animal(this, (int) (Math.floor(0.25*mama.getEnergy() + 0.25* tata.getEnergy())),position);
+        Animal baby = new Animal(this, (int) (Math.floor(0.25*mum.getEnergy() + 0.25* dad.getEnergy())),mum.getPosition());
 
         int randomizedSide = random.nextInt(2);
-        int divisor= (int) Math.floor( (float) mama.getEnergy()/(mama.getEnergy() + tata.getEnergy())*32);
+        int divisor= (int) Math.floor( (float) mum.getEnergy()/(mum.getEnergy() + dad.getEnergy())*32);
 
         if(randomizedSide == 0){ // left side
-            mamasPart = mama.getGenotype().subList(0,divisor);
-            tatasPart = tata.getGenotype().subList(divisor,32);
+            mumsPart = mum.getGenotype().subList(0,divisor);
+            dadsPart = dad.getGenotype().subList(divisor,32);
         }
-        else{ //right side
-            mamasPart = mama.getGenotype().subList(32-divisor,32);
-            tatasPart =  tata.getGenotype().subList(0,32-divisor);
+        else{ // right side
+            mumsPart = mum.getGenotype().subList(32-divisor,32);
+            dadsPart =  dad.getGenotype().subList(0,32-divisor);
         }
 
-        mamasPart.addAll(tatasPart);
-        babysGenotype = mamasPart;
+        mumsPart.addAll(dadsPart);
+        babysGenotype = mumsPart;
         Collections.sort(babysGenotype);
         baby.setBabysGenotype(babysGenotype);
+        addAnimalToAnimals(baby,baby.getPosition());
+    }
 
-        return baby;
+    public void reproduction(){
+        for (Vector2d position: animals.keySet()){
+            if (animals.get(position).size() >=2){
+                List<Animal> parents = this.getPotentialParents(position);
+                if (!(this.isAbleToWooHoo(parents))) continue;
+                this.animalWooHoo(parents);
+            }
+        }
+    }
+
+    public List<Animal> getPotentialParents(Vector2d position){
+        List<Animal> potentialParents = animals.get(position);
+        potentialParents.sort(new energyComparator());
+        return potentialParents.subList(0,2);
+    }
+
+    public boolean isAbleToWooHoo(List<Animal> animals){
+        return ((animals.get(0).getEnergy()>=0.5* this.startEnergy)&&(animals.get(1).getEnergy()>=0.5* this.startEnergy));
     }
 
     public boolean isNoAnimalThere(Vector2d position){

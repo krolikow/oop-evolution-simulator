@@ -14,9 +14,9 @@ public class World {
 //            animal.move();
 //            System.out.println(animal.getDirection()+ " " + animal.getPosition());
 
-            Animal mamaAnimal = new Animal(map,0,new Vector2d(2,2));
-            Animal tataAnimal = new Animal(map,14,new Vector2d(2,2));
-            Animal randomAnimal = new Animal(map,0,new Vector2d(2,2));
+            Animal mamaAnimal = new Animal(map,10,new Vector2d(2,2));
+            Animal tataAnimal = new Animal(map,10,new Vector2d(2,2));
+            Animal randomAnimal = new Animal(map,10,new Vector2d(2,2));
             Grass grassTuft = new Grass(new Vector2d(2,2));
             map.grass.put(grassTuft.getPosition(), grassTuft);
             map.addAnimalToAnimals(mamaAnimal, mamaAnimal.getPosition());
@@ -25,6 +25,8 @@ public class World {
             System.out.println(mamaAnimal.getDirection() +" "+ tataAnimal.getDirection()+" "+randomAnimal.getDirection());
             System.out.println(mamaAnimal.getEnergy() +" "+ tataAnimal.getEnergy()+" "+randomAnimal.getEnergy());
 
+            map.reproduction();
+            System.out.println(map.animals);
 
 //            System.out.println(mamaAnimal.getGenotype());
 //            System.out.println(tataAnimal.getGenotype());
