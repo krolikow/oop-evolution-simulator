@@ -9,15 +9,16 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
     private MapDirection direction;
     private Vector2d position;
     private final AbstractWorldMap map; // IWorldMap?
-    private int energy;
-    private List<Integer> genotype; //equals `
+    private int energy,moveEnergy;
+    private ArrayList<Integer> genotype; //equals `
     private final ArrayList<IPositionChangeObserver> observers = new ArrayList<>();
 
-    public Animal(AbstractWorldMap map,int startEnergy,Vector2d position,ArrayList<Integer> genotype){
+    public Animal(AbstractWorldMap map,int startEnergy,int moveEnergy,Vector2d position,ArrayList<Integer> genotype){
         this.map =  map;
         this.position = position;
         this.direction = setDirection();
         this.energy = startEnergy;
+        this.moveEnergy = moveEnergy;
         this.genotype = genotype; // value or reference?
     }
 
@@ -60,11 +61,14 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         return genotype;
     }
 
-    public void setBabysGenotype(List<Integer> genotype){ //tested
+    public void setBabysGenotype(ArrayList<Integer> genotype){ //tested
         Collections.sort(genotype);
-        this.genotype = genotype;
+        setGenotype(genotype);
     }
 
+    public void setGenotype(ArrayList<Integer> genotype){
+        this.genotype = genotype;
+    }
     public int generateMoveDirection(){ // WYBIERA KIERUNEK NA PODTAWIE GENOTYPU tested
         Random random = new Random();
         int randomIndex = random.nextInt(this.genotype.size());
@@ -83,7 +87,6 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         this.direction = temporaryDirection;
     }
 
-
     public void move() { //interface? (add,subtract)  WYKONUJE DOCELOWY RUCH W LOSOWYM (NA PODSTAWIE GENOTYPU) KIERUNKU tested
         int direction = generateMoveDirection();
 
@@ -91,13 +94,16 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
             case 0 -> {
                 Vector2d newPosition = this.position.add(this.direction.toUnitVector());
                 if (this.map.canMoveTo(newPosition)){
+                    this.energy -= moveEnergy;
                     positionChanged(this,this.position, newPosition);
                     this.position = newPosition;
+
                 }
             }
             case 4 -> {
                 Vector2d newPosition = this.position.subtract(this.direction.toUnitVector());
                 if (this.map.canMoveTo(newPosition)) {
+                    this.energy -= moveEnergy;
                     positionChanged(this,this.position, newPosition);
                     this.position = newPosition;
                 }
@@ -106,6 +112,7 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
             case 1,2,3,5,6,7 -> turn(direction);
         }
     }
+
 
     // OBSERVERS //TODO
 
