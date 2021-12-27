@@ -20,26 +20,31 @@ public class BoundedMap extends AbstractWorldMap implements IWorldMap{
         this.heightJungle = (int) Math.floor(height*jungleRatio);
         this.jungleRatio = jungleRatio;
         this.initialNumberOfAnimals = initialNumberOfAnimals;
+
         initializeMap();
     }
 
-    @Override
-    public boolean placeAnimal(Animal animal) {
-        super.placeAnimal(animal);
-        return true;
-    }
-
-    public void positionChanged(Animal animal, Vector2d oldPosition, Vector2d newPosition) {
-        super.positionChanged(animal,oldPosition,newPosition);
-    }
+//    @Override
+//    public boolean placeAnimal(Animal animal) {
+//        super.placeAnimal(animal);
+//        return true;
+//    }
+//
+//    public void positionChanged(Animal animal, Vector2d oldPosition, Vector2d newPosition) {
+//        super.positionChanged(animal,oldPosition,newPosition);
+//    }
 
     @Override
     public void positionChanged() {
-
     }
-
-    @Override
-    public String toString() {
-        return super.toString();
-    }
+//
+//    @Override
+//    public void positionChanged() {
+//
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return super.toString();
+//    }
 }

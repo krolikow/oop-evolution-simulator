@@ -2,7 +2,6 @@ package project;
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 
@@ -10,8 +9,8 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
     private MapDirection direction;
     private Vector2d position;
     private final AbstractWorldMap map; // IWorldMap?
-    private int energy,moveEnergy;
-    private ArrayList<Integer> genotype; //equals `
+    private int energy,moveEnergy,epoch, childrenAmount;
+    private ArrayList<Integer> genotype; //equals ?`
     private final ArrayList<IPositionChangeObserver> observers = new ArrayList<>();
 
     public Animal(AbstractWorldMap map,int startEnergy,int moveEnergy,Vector2d position,ArrayList<Integer> genotype){
@@ -20,7 +19,9 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         this.direction = setDirection();
         this.energy = startEnergy;
         this.moveEnergy = moveEnergy;
-        this.genotype = genotype; // value or reference?
+        this.epoch = 0;
+        this.childrenAmount = 0;
+        this.genotype = genotype;
     }
 
     public Animal(AbstractWorldMap map,int startEnergy,Vector2d position){
@@ -28,15 +29,17 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         this.position = position;
         this.direction = setDirection();
         this.energy = startEnergy;
-        this.genotype = setGenotype(); // value or reference?
+        this.epoch = 0;
+        this.genotype = setGenotype();
     }
 
     public void setEnergy(int energy){
         this.energy = energy;
     }
+
     // ANIMALS' INITIALIZATION
 
-    public MapDirection setDirection(){ // tested
+    public MapDirection setDirection(){
         int direction = (int)Math.floor(Math.random()*8);
         return switch (direction){
             case 0 -> MapDirection.NORTH;
@@ -51,8 +54,7 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         };
     }
 
-
-    public ArrayList<Integer> setGenotype(){ //tested
+    public ArrayList<Integer> setGenotype(){
         ArrayList<Integer> genotype = new ArrayList<>();
         Random random = new Random();
         for(int i =0; i<32;i++){
@@ -62,7 +64,7 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         return genotype;
     }
 
-    public void setBabysGenotype(ArrayList<Integer> genotype){ //tested
+    public void setBabysGenotype(ArrayList<Integer> genotype){
         Collections.sort(genotype);
         setGenotype(genotype);
     }
@@ -70,13 +72,30 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
     public void setGenotype(ArrayList<Integer> genotype){
         this.genotype = genotype;
     }
-    public int generateMoveDirection(){ // WYBIERA KIERUNEK NA PODTAWIE GENOTYPU tested
+
+    public int generateMoveDirection(){
         Random random = new Random();
         int randomIndex = random.nextInt(this.genotype.size());
         return this.genotype.get(randomIndex);
     }
 
-    public void turn(int number){ // todo: optimalize with previous method tested
+    public void incrementEpoch(){
+        this.epoch+=1;
+    }
+
+    public void incrementChildrenAmount(){
+        this.childrenAmount +=1;
+    }
+
+    public int getChildrenAmount(){
+        return this.childrenAmount;
+    }
+
+    public int getEpoch(){
+        return this.epoch;
+    }
+
+    public void turn(int number){
         if ((number>7)||(number<0)) {
             throw new IllegalArgumentException("Illegal direction specification: " + number);
         }
@@ -88,7 +107,20 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         this.direction = temporaryDirection;
     }
 
-    public void move() { //interface? (add,subtract)  WYKONUJE DOCELOWY RUCH W LOSOWYM (NA PODSTAWIE GENOTYPU) KIERUNKU tested
+    public Vector2d teleport(Vector2d position){ //bedzie wywolywana jezeli zwierze bedzie mialo zamiar wyjsc poza mapę
+        if ((position.x>=this.map.width)&&(this.map.isYInBounds(position))) return new Vector2d(0,position.y);
+        else if ((position.x<0)&&(this.map.isYInBounds(position))) return new Vector2d(this.map.width-1,position.y);
+        else if ((position.y<0)&&(this.map.isXInBounds(position))) return new Vector2d(position.x,this.map.height -1);
+        else if ((position.y>=this.map.height)&&(this.map.isXInBounds(position))) return new Vector2d(position.x,0);
+        else if ((position.x>=this.map.width)&&((position.y>=this.map.height))) return new Vector2d(0,0);
+        else if ((position.x<0)&&((position.y<0))) return new Vector2d(this.map.width-1,this.map.height-1);
+        else if ((position.x<0)&&(position.y>=this.map.height)) return new Vector2d(this.map.width-1,0);
+        else if ((position.x>=this.map.width)&&((position.y<0))) return new Vector2d(0,this.map.height-1);
+        else return position;
+    }
+
+
+    public void move() {
         int direction = generateMoveDirection();
 
         switch (direction) {
@@ -110,12 +142,15 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
                 }
 
             }
-            case 1,2,3,5,6,7 -> turn(direction);
+            case 1,2,3,5,6,7 -> {
+                this.energy -= moveEnergy;
+                turn(direction);
+            }
         }
     }
 
 
-    // OBSERVERS //TODO
+    // OBSERVERS
 
     public void addObserver(IPositionChangeObserver observer){
         observers.add(observer);
@@ -151,7 +186,7 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
     }
 
     public boolean isDead(){
-        return this.getEnergy() == 0;
+        return this.getEnergy() <= 0;
     }
 
     // FOR TESTING PURPOSES
@@ -162,7 +197,7 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
 
     public int getEnergy(){return this.energy;}
 
-    public List<Integer> getGenotype(){return this.genotype;}
+    public ArrayList<Integer> getGenotype(){return this.genotype;}
 
 }
 
