@@ -28,6 +28,9 @@ public class App extends Application implements IPositionChangeObserver {
     private Menu menu;
     private final VBox statisticsBoxBoundedMap = new VBox();
     private final VBox statisticsBoxUnboundedMap = new VBox();
+    Button saveStatisticsButtonBoundedMap = new Button("Save statistics");
+    Button saveStatisticsButtonUnboundedMap = new Button("Save statistics");
+
 
     @Override
     public void init() {
@@ -177,11 +180,11 @@ public class App extends Application implements IPositionChangeObserver {
 
         HBox hboxB = new HBox(gridB,chartBoxBMap,hBoxInterfaceB);
         updateStatistics(engineBMap,boundedMap,statisticsBoxBoundedMap);
-        hboxB.getChildren().addAll(statisticsBoxBoundedMap);
+        hboxB.getChildren().addAll(statisticsBoxBoundedMap,saveStatisticsButtonBoundedMap);
 
         HBox hboxUB = new HBox(gridUB,chartBoxUBMap,hBoxInterfaceUB);
         updateStatistics(engineUBMap,unboundedMap,statisticsBoxUnboundedMap);
-        hboxUB.getChildren().addAll(statisticsBoxUnboundedMap);
+        hboxUB.getChildren().addAll(statisticsBoxUnboundedMap,saveStatisticsButtonUnboundedMap);
 
         try {
             statisticsPanelBMap.start(primaryStage);
@@ -214,6 +217,16 @@ public class App extends Application implements IPositionChangeObserver {
 
         stopButtonUBMap.setOnAction(click ->{
             engineUBMap.switchON();
+        });
+
+        saveStatisticsButtonBoundedMap.setOnAction((event) -> {
+            engineBMap.getStatisticsConverter().addToStatistics(engineBMap.getNewAverageDataLine());
+            engineBMap.getStatisticsConverter().convertToCSV("src\\main\\resources\\bounded-map-statistics");
+        });
+
+        saveStatisticsButtonUnboundedMap.setOnAction((event) -> {
+            engineUBMap.getStatisticsConverter().addToStatistics(engineUBMap.getNewAverageDataLine());
+            engineUBMap.getStatisticsConverter().convertToCSV("src\\main\\resources\\unbounded-map-statistics");
         });
 
 

@@ -1,5 +1,7 @@
 package project;
 
+import project.statictics.StatisticsConverter;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,6 +17,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     protected ConcurrentHashMap<ArrayList<Integer>,Integer> allGenotypes = new ConcurrentHashMap<>();
     protected int lifeSpanSum = 0;
     protected int deadAnimalsAmount = 0;
+
 
 
     @Override
