@@ -65,14 +65,30 @@ public class Menu extends Application {
         initialNumberOfAnimalsHBox.getChildren().addAll(initialNumberOfAnimalsLabel,initialNumberOfAnimals);
         initialNumberOfAnimalsHBox.setAlignment(Pos.CENTER);
 
-        Button submitButton = new Button("Submit");
-        menu.getChildren().addAll(mainLabel,heightHBox,widthHBox,startEnergyHBox,moveEnergyHBox,plantEnergyHBox,jungleRatioHBox,initialNumberOfAnimalsHBox,submitButton);
-        menu.setAlignment(Pos.CENTER);
-        Scene scene = new Scene(menu,500,500);
+
+        Scene scene = new Scene(menu, 500, 500);
         Stage myStage = new Stage();
         myStage.setTitle("Evolution Simulator");
         myStage.setScene(scene);
         myStage.show();
+
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction((e) -> {
+            Game game = new Game(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()),
+                    Integer.parseInt(startEnergy.getText()), Integer.parseInt(moveEnergy.getText()),
+                    Integer.parseInt(plantEnergy.getText()), Double.parseDouble(jungleRatio.getText()),
+                    Integer.parseInt(initialNumberOfAnimals.getText()));
+            try
+            {
+                game.start(primaryStage);
+                myStage.hide();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        menu.getChildren().addAll(mainLabel, heightHBox, widthHBox, startEnergyHBox, moveEnergyHBox, plantEnergyHBox, jungleRatioHBox, initialNumberOfAnimalsHBox, submitButton);
+        menu.setAlignment(Pos.CENTER);
     }
 
 }

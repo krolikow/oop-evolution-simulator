@@ -168,7 +168,6 @@ public class SimulationEngine implements IEngine, Runnable {
                 this.updateAverageData();
                 statisticsConverter.addToStatistics(this.getNewLine());
 
-//                if (days%3==0)
                 Platform.runLater(() -> {
                     statisticsPanel.prepareData();
                 });
