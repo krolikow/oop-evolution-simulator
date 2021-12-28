@@ -1,7 +1,7 @@
 package project;
 import java.util.Comparator;
 
-public class energyComparator implements Comparator<Animal>
+public class EnergyComparator implements Comparator<Animal>
 {
     @Override
     public int compare(Animal o1, Animal o2) {

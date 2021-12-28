@@ -11,8 +11,8 @@ import java.util.*;
 public class SimulationEngine implements IEngine, Runnable {
     private final AbstractWorldMap map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
-    private int moveDelay, days = 0;
-    private boolean isON;
+    private int moveDelay, magicTricks, days = 0;
+    private boolean isON, isMagic;
     private final StatisticsPanel statisticsPanel;
     private final GridPane grid;
     private final VBox statistics;
@@ -24,6 +24,8 @@ public class SimulationEngine implements IEngine, Runnable {
         this.map = map;
         this.moveDelay = moveDelay;
         this.isON = isON;
+        this.isMagic = false;
+        this.magicTricks = 3;
         this.statisticsPanel = statPanel;
         this.grid = grid;
         this.statistics = statistics;
@@ -34,14 +36,35 @@ public class SimulationEngine implements IEngine, Runnable {
         this.isON = !this.isON;
     }
 
+    public void doMagicTrick() {
+        if ((this.isMagic) && (this.getMagicTricksNumber() > 0) && (this.getAllAnimalsNumber(this.map) == 5)) {
+            for (int i = 0; i < 5; i++) {
+                this.map.place(this.map.copyAnimal());
+            }
+            decrementMagicTricks();
+        }
+    }
+
     // GETTERS & SETTERS
 
     public StatisticsConverter getStatisticsConverter() {
         return this.statisticsConverter;
     }
 
+    public void setIsMagic() {
+        this.isMagic = true;
+    }
+
+    public void decrementMagicTricks() {
+        this.magicTricks -= 1;
+    }
+
     public void setIsON() {
         this.isON = true;
+    }
+
+    public int getMagicTricksNumber(){
+        return this.magicTricks;
     }
 
     public int getAllAnimalsNumber(AbstractWorldMap map) {
@@ -71,11 +94,10 @@ public class SimulationEngine implements IEngine, Runnable {
             }
         }
         int allAnimals = this.getAllAnimalsNumber(map);
-        if(allAnimals>0){
+        if (allAnimals > 0) {
             StatisticsPanel.averageEnergyLevel.put(days, energySum / allAnimals);
             return (double) energySum / allAnimals;
-        }
-        else{
+        } else {
             StatisticsPanel.averageEnergyLevel.put(days, 0);
             return 0;
         }
@@ -107,8 +129,7 @@ public class SimulationEngine implements IEngine, Runnable {
         if (livingAnimals > 0) {
             StatisticsPanel.averageChildrenAmount.put(days, childrenAmount / livingAnimals);
             return childrenAmount / livingAnimals;
-        }
-        else{
+        } else {
             StatisticsPanel.averageChildrenAmount.put(days, 0);
             return 0;
         }
@@ -119,7 +140,7 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public String getGenotypeDominant(AbstractWorldMap map) {
-        ArrayList<Integer> mostCommonGenotype = new ArrayList<>(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
+        ArrayList<Integer> mostCommonGenotype = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
         int frequency = -1;
         for (Map.Entry<ArrayList<Integer>, Integer> entity : map.allGenotypes.entrySet()) {
             if (entity.getValue() > frequency) {
@@ -163,10 +184,10 @@ public class SimulationEngine implements IEngine, Runnable {
         while (true) {
             if (this.isON) {
                 map.removeDeadBodies();
+                this.doMagicTrick();
                 map.moving();
                 for (IPositionChangeObserver animalMoveObserver : this.observers)
                     animalMoveObserver.positionChanged(this.grid, this.map, this, this.statistics);
-
                 map.eating();
                 map.reproduction();
                 map.addNewPlants();
@@ -179,7 +200,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 days++;
                 this.updateAverageData();
                 statisticsConverter.addToStatistics(this.getNewLine());
-
+                System.out.println(this.getMagicTricksNumber());
                 Platform.runLater(() -> {
                     statisticsPanel.prepareData();
                 });

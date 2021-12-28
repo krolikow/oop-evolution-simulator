@@ -24,6 +24,16 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         this.genotype = setGenotype();
     }
 
+    public Animal(AbstractWorldMap map,int startEnergy,Vector2d position,ArrayList<Integer> genotype){
+        this.map =  map;
+        this.position = position;
+        this.direction = setDirection();
+        this.energy = startEnergy;
+        this.epoch = 0;
+        this.childrenAmount = 0;
+        this.genotype = genotype;
+    }
+
     public void setEnergy(int energy){
         this.energy = energy;
     }
@@ -161,15 +171,9 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         };
     }
 
-    boolean isAt(Vector2d position) {
-        return this.position.equals(position);
-    }
-
     public boolean isDead(){
         return this.getEnergy() <= 0;
     }
-
-    // FOR TESTING PURPOSES
 
     public MapDirection getDirection() {return this.direction;}
 

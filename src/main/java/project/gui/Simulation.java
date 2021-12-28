@@ -62,10 +62,10 @@ public class Simulation extends Application implements IPositionChangeObserver {
         this.gridUB.setGridLinesVisible(true);
         this.gridB.setGridLinesVisible(true);
 
-        HBox hBoxInterfaceB = createHBoxInterface(startButtonBMap, stopButtonBMap, engineBMap);
+        HBox hBoxInterfaceB = createHBoxInterface(startButtonBMap, startMagicButtonBMap, stopButtonBMap, engineBMap);
         initializeGrid(gridB, boundedMap);
 
-        HBox hBoxInterfaceUB = createHBoxInterface(startButtonUBMap, stopButtonUBMap, engineUBMap);
+        HBox hBoxInterfaceUB = createHBoxInterface(startButtonUBMap, startMagicButtonUBMap, stopButtonUBMap, engineUBMap);
         initializeGrid(gridUB, unboundedMap);
 
         HBox hboxB = new HBox(gridB, chartBoxBMap, hBoxInterfaceB);
@@ -175,14 +175,17 @@ public class Simulation extends Application implements IPositionChangeObserver {
 
 
     Button stopButtonBMap = new Button("Stop");
+    Button startMagicButtonBMap = new Button("Start Magic");
     Button startButtonBMap = new Button("Start");
+
     Button stopButtonUBMap = new Button("Stop");
     Button startButtonUBMap = new Button("Start");
+    Button startMagicButtonUBMap = new Button("Start Magic");
 
 
-    public HBox createHBoxInterface(Button startButton, Button stopButton, SimulationEngine engine) {
+    public HBox createHBoxInterface(Button startButton, Button startMagicButton, Button stopButton, SimulationEngine engine) {
 
-        HBox hBoxInterface = new HBox(startButton, stopButton);
+        HBox hBoxInterface = new HBox(startButton, startMagicButton, stopButton);
         hBoxInterface.setAlignment(Pos.CENTER);
 
         startButton.setOnAction(click -> {
@@ -190,6 +193,14 @@ public class Simulation extends Application implements IPositionChangeObserver {
             engineThread.start();
             engine.setIsON();
         });
+
+        startMagicButton.setOnAction(click -> {
+            Thread engineThread = new Thread(engine);
+            engineThread.start();
+            engine.setIsON();
+            engine.setIsMagic();
+        });
+
 
         return hBoxInterface;
     }
@@ -202,9 +213,9 @@ public class Simulation extends Application implements IPositionChangeObserver {
         Label averageLifeSpanNumberLabel = new Label("Average life span: " + engine.getAverageLifeSpan(map));
         Label averageEnergyLevelNumberLabel = new Label("Average energy level: " + engine.getAverageEnergyLevel(map));
         Label genotypeDominantLabel = new Label("Genotype dominant: " + engine.getGenotypeDominant(map));
-
+        Label numberOfMagicTricksLeft = new Label("There are " + engine.getMagicTricksNumber() + " magic tricks left." );
         box.getChildren().addAll(daysLabel, animalNumberLabel, plantNumberLabel, averageChildrenAmountNumberLabel,
-                averageLifeSpanNumberLabel, averageEnergyLevelNumberLabel, genotypeDominantLabel);
+                averageLifeSpanNumberLabel, averageEnergyLevelNumberLabel, genotypeDominantLabel,numberOfMagicTricksLeft);
         box.setAlignment(Pos.CENTER);
     }
 

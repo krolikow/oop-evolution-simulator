@@ -1,6 +1,5 @@
 package project;
 
-import java.util.Map;
 
 /**
  * The interface responsible for interacting with the map of the world.

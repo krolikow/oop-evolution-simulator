@@ -25,7 +25,7 @@ public class UnBoundedMap extends AbstractWorldMap{
         initializeMap();
     }
 
-    public Vector2d teleport(Vector2d position){ // if an animal wants to get over the map boundaries
+    public Vector2d teleport(Vector2d position){ // converts coordinates if an animal wants to get over the map boundaries
         if ((position.x>=this.width)&&(this.isYInBounds(position))) return new Vector2d(0,position.y);
         else if ((position.x<0)&&(this.isYInBounds(position))) return new Vector2d(this.width-1,position.y);
         else if ((position.y<0)&&(this.isXInBounds(position))) return new Vector2d(position.x,this.height -1);
@@ -41,7 +41,6 @@ public class UnBoundedMap extends AbstractWorldMap{
     public Vector2d canMoveTo(Vector2d oldPosition, Vector2d newPosition) {
         return teleport(newPosition);
     }
-
 
 
     @Override

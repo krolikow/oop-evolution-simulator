@@ -17,6 +17,12 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     protected int deadAnimalsAmount = 0;
 
 
+    public Animal copyAnimal(){
+        int range = animalsList.size();
+        int randomIndex = (int) Math.floor(Math.random() * (range));
+        return new Animal(this,startEnergy,animalsList.get(randomIndex).getPosition(),animalsList.get(randomIndex).getGenotype());
+    }
+
     @Override
     public AbstractWorldMapElement objectAt(Vector2d position) {
         if (isNoAnimalThere(position)) {
@@ -201,7 +207,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
     public List<Animal> getPotentialParents(Vector2d position) {
         List<Animal> potentialParents = animals.get(position);
-        potentialParents.sort(new energyComparator());
+        potentialParents.sort(new EnergyComparator());
         return potentialParents.subList(0, 2);
     }
 
@@ -234,7 +240,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     }
 
     public List<Animal> getFeastingAnimals(Vector2d position) {
-        this.animals.get(position).sort(new energyComparator());
+        this.animals.get(position).sort(new EnergyComparator());
         int i = 0;
         while ((i < this.animals.get(position).size()) && (this.animals.get(position).get(i).getEnergy() == this.animals.get(position).get(0).getEnergy())) {
             i++;
@@ -329,7 +335,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         return this.width;
     }
 
-
     public int getHeight() {
         return this.height;
     }
@@ -342,14 +347,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         return lowerLeft;
     }
 
-    public int getWidthJungle() {
-        return widthJungle;
-    }
-
-    public int getHeightJungle() {
-        return heightJungle;
-    }
-
     public Vector2d getLowerLeftJungle() {
         return lowerLeftJungle;
     }
@@ -357,7 +354,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     public Vector2d getUpperRightJungle() {
         return upperRightJungle;
     }
-
 
     @Override
     public String toString() {
