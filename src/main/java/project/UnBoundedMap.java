@@ -1,6 +1,7 @@
 package project;
 
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 public class UnBoundedMap extends AbstractWorldMap{
 
@@ -38,16 +39,13 @@ public class UnBoundedMap extends AbstractWorldMap{
 
     @Override
     public Vector2d canMoveTo(Vector2d oldPosition, Vector2d newPosition) {
-        return teleport(oldPosition);
-    }
-
-    @Override
-    public void positionChanged() {
+        return teleport(newPosition);
     }
 
 
+
     @Override
-    public void positionChanged(GridPane grid, AbstractWorldMap map) {
+    public void positionChanged(GridPane grid, AbstractWorldMap map, SimulationEngine engine, VBox statistics) {
 
     }
 }

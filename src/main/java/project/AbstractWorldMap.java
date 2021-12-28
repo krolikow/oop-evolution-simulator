@@ -2,6 +2,7 @@ package project;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
     protected ConcurrentHashMap<Vector2d, Grass> grass = new ConcurrentHashMap<>();
@@ -14,8 +15,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     protected ConcurrentHashMap<ArrayList<Integer>,Integer> allGenotypes = new ConcurrentHashMap<>();
     protected int lifeSpanSum = 0;
     protected int deadAnimalsAmount = 0;
-
-
 
 
     @Override
@@ -62,7 +61,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     }
 
     @Override
-    public boolean placeAnimal(Animal animal) {
+    public boolean place(Animal animal) {
         Vector2d position = animal.getPosition();
         if (!(this.isOffTheMap(position))) {
             this.addAnimalToAnimals(animal, position);
@@ -105,7 +104,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
             Vector2d newPosition = new Vector2d(x, y);
             if (!(this.isOccupied(newPosition))) {
                 Animal animal = new Animal(this, this.startEnergy, newPosition);
-                this.placeAnimal(animal);
+                this.place(animal);
                 i++;
             }
         }
@@ -125,21 +124,26 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     }
 
 
-    public void removeDeadBodies() { // FIXME concurrent
-        List<Animal> bodiesToRemove = new LinkedList<>();
+    public void removeDeadBodies() {
+        CopyOnWriteArrayList<Animal> bodiesToRemove = new CopyOnWriteArrayList<>();
+        CopyOnWriteArrayList<Animal> bodiesToRemoveList = new CopyOnWriteArrayList<>();
         for (Vector2d animalsPosition : animals.keySet()) {
             for (Animal potentiallyDeadAnimal : animals.get(animalsPosition)) {
                 if (potentiallyDeadAnimal.isDead()) {
                     this.updateLifeSpan(potentiallyDeadAnimal);
                     this.updateDeadAnimals();
                     bodiesToRemove.add(potentiallyDeadAnimal);
-//                    this.animalsList.remove(potentiallyDeadAnimal);
+                    bodiesToRemoveList.add(potentiallyDeadAnimal);
                 }
             }
         }
 
         for (Animal deadBody : bodiesToRemove) {
             removeAnimalFromAnimals(deadBody, deadBody.getPosition());
+        }
+
+        for(Animal deadBody : bodiesToRemoveList) {
+            bodiesToRemoveList.remove(deadBody);
         }
     }
 
@@ -192,7 +196,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         }
 
         for (Animal baby : incubator) {
-            this.placeAnimal(baby);
+            this.place(baby);
         }
     }
 

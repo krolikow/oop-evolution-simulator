@@ -11,7 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import project.statictics.StatPanel;
+import project.statictics.StatisticsPanel;
 
 public class App extends Application implements IPositionChangeObserver {
     private AbstractWorldMap boundedMap;
@@ -21,24 +21,26 @@ public class App extends Application implements IPositionChangeObserver {
     private final GridPane gridB = new GridPane();
     private final GridPane gridUB = new GridPane();
     private final GuiElementBox elementCreator = new GuiElementBox();
-    private StatPanel statisticsPanelBMap;
-    private StatPanel statisticsPanelUBMap;
+    private StatisticsPanel statisticsPanelBMap;
+    private StatisticsPanel statisticsPanelUBMap;
     private final VBox chartBoxBMap = new VBox();
     private final VBox chartBoxUBMap = new VBox();
     private Menu menu;
+    private final VBox statisticsBoxBoundedMap = new VBox();
+    private final VBox statisticsBoxUnboundedMap = new VBox();
 
     @Override
     public void init() {
 
         try{
             this.menu = new Menu();
-            this.statisticsPanelBMap = new StatPanel();
-            this.statisticsPanelUBMap = new StatPanel();
+            this.statisticsPanelBMap = new StatisticsPanel();
+            this.statisticsPanelUBMap = new StatisticsPanel();
             this.boundedMap = new BoundedMap(10,10,7,10 ,2,0.5,10);
-            this.unboundedMap = new BoundedMap(10,10,7,10 ,2,0.5,10);
-            this.engineBMap = new SimulationEngine(this.boundedMap, 300,true, statisticsPanelBMap,gridB);
+            this.unboundedMap = new UnBoundedMap(10,10,7,10 ,2,0.5,10);
+            this.engineBMap = new SimulationEngine(this.boundedMap, 300,true, statisticsPanelBMap,gridB,statisticsBoxBoundedMap);
             this.engineBMap.addObserver(this);
-            this.engineUBMap = new SimulationEngine(this.unboundedMap, 300,true, statisticsPanelUBMap,gridUB);
+            this.engineUBMap = new SimulationEngine(this.unboundedMap, 300,true, statisticsPanelUBMap,gridUB,statisticsBoxUnboundedMap);
             this.engineUBMap.addObserver(this);
         }
 
@@ -85,12 +87,6 @@ public class App extends Application implements IPositionChangeObserver {
             grid.add(yAxis, 0, i, 1, 1);
         }
         Pane statPane = new Pane();
-//        statPane.getChildren().add(statPanel);
-//        statPane.setMaxWidth(400);
-//        statPane.setMinWidth(400);
-//        statPane.maxHeight(400);
-//        statPane.minHeight(400);
-//        statPane.setBackground(new Background(new BackgroundFill(Color.rgb(102, 204, 100), CornerRadii.EMPTY, Insets.EMPTY)));
         grid.add(statPane,0,0,5,5);
         for (int i=1; i<= height+1; i++) {
             for (int j=1; j<= width+1; j++) {
@@ -117,6 +113,8 @@ public class App extends Application implements IPositionChangeObserver {
         grid.getRowConstraints().add(new RowConstraints(40));
         GridPane.setHalignment(label, HPos.CENTER);
     }
+
+
     Button stopButtonBMap = new Button("Stop");
     Button startButtonBMap = new Button("Start");
     Button stopButtonUBMap = new Button("Stop");
@@ -137,34 +135,32 @@ public class App extends Application implements IPositionChangeObserver {
         return hBoxInterface;
     }
 
+    public void updateStatistics(SimulationEngine engine,AbstractWorldMap map,VBox box){
+        Label daysLabel = new Label("Epochs number: " + engine.getDays());
+        Label animalNumberLabel = new Label("Animals number: " + engine.getAllAnimalsNumber(map));
+        Label plantNumberLabel = new Label("Plant number: " + engine.getAllPlantsNumber(map));
+        Label averageChildrenAmountNumberLabel = new Label("Average children amount: " + engine.getAverageChildrenAmount(map));
+        Label averageLifeSpanNumberLabel = new Label("Average life span: " + engine.getAverageLifeSpan(map));
+        Label averageEnergyLevelNumberLabel = new Label("Average energy level: " + engine.getAverageEnergyLevel(map));
+        Label genotypeDominantLabel = new Label("Genotype dominant: " + engine.getGenotypeDominant(map));
+
+        box.getChildren().addAll(daysLabel,animalNumberLabel,plantNumberLabel,averageChildrenAmountNumberLabel,
+                averageLifeSpanNumberLabel,averageEnergyLevelNumberLabel,genotypeDominantLabel);
+        box.setAlignment(Pos.CENTER);
+    }
 
     @Override
     public void positionChanged(Animal animal, Vector2d oldPosition, Vector2d newPosition) {}
 
-    @Override
-    public void positionChanged() {
-
-    }
-
-//    @Override
-//    public void positionChanged() {
-//        Platform.runLater(() -> {
-//            gridB.getChildren().clear();
-//            initializeGrid(gridB,unboundedMap);
-//        });
-//
-//        Platform.runLater(() -> {
-//            gridUB.getChildren().clear();
-//            initializeGrid(gridUB,boundedMap);
-//        });
-//    }
-
 
     @Override
-    public void positionChanged(GridPane grid, AbstractWorldMap map) {
+    public void positionChanged(GridPane grid, AbstractWorldMap map, SimulationEngine engine, VBox statistics) {
         Platform.runLater(() -> {
             grid.getChildren().clear();
+            statistics.getChildren().clear();
             initializeGrid(grid,map);
+            updateStatistics(engine,map,statistics);
+
         });
     }
 
@@ -178,6 +174,14 @@ public class App extends Application implements IPositionChangeObserver {
 
         HBox hBoxInterfaceUB = createHBoxInterface(startButtonUBMap,stopButtonUBMap,engineUBMap);
         initializeGrid(gridUB,unboundedMap);
+
+        HBox hboxB = new HBox(gridB,chartBoxBMap,hBoxInterfaceB);
+        updateStatistics(engineBMap,boundedMap,statisticsBoxBoundedMap);
+        hboxB.getChildren().addAll(statisticsBoxBoundedMap);
+
+        HBox hboxUB = new HBox(gridUB,chartBoxUBMap,hBoxInterfaceUB);
+        updateStatistics(engineUBMap,unboundedMap,statisticsBoxUnboundedMap);
+        hboxUB.getChildren().addAll(statisticsBoxUnboundedMap);
 
         try {
             statisticsPanelBMap.start(primaryStage);
@@ -199,8 +203,11 @@ public class App extends Application implements IPositionChangeObserver {
 
         chartBoxUBMap.getChildren().addAll(this.statisticsPanelUBMap.getChart());
         chartBoxBMap.getChildren().addAll(this.statisticsPanelBMap.getChart());
-        HBox hBoxInterface = new HBox(hBoxInterfaceB,hBoxInterfaceUB, this.gridB,this.gridUB, chartBoxBMap,chartBoxUBMap);
-        hBoxInterface.setAlignment(Pos.CENTER);
+
+        VBox mainVBox = new VBox(hboxB,hboxUB);
+        mainVBox.setAlignment(Pos.CENTER);
+        mainVBox.setSpacing(20);
+
         stopButtonBMap.setOnAction(click ->{
             engineBMap.switchON();
         });
@@ -210,9 +217,9 @@ public class App extends Application implements IPositionChangeObserver {
         });
 
 
-        primaryStage.setScene(new Scene(hBoxInterface));
+        primaryStage.setScene(new Scene(mainVBox));
         primaryStage.setTitle("Evolution Simulator");
-        primaryStage.setFullScreen(true);
+//        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 }

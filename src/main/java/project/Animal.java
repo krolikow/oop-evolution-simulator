@@ -8,9 +8,9 @@ import java.util.Random;
 public class Animal extends AbstractWorldMapElement implements IMapElement{
     private MapDirection direction;
     private Vector2d position;
-    private final AbstractWorldMap map; // IWorldMap?
+    private final AbstractWorldMap map;
     private int energy,moveEnergy,epoch, childrenAmount;
-    private ArrayList<Integer> genotype; //equals ?`
+    private ArrayList<Integer> genotype;
     private final ArrayList<IPositionChangeObserver> observers = new ArrayList<>();
 
     public Animal(AbstractWorldMap map,int startEnergy,int moveEnergy,Vector2d position,ArrayList<Integer> genotype){

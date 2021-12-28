@@ -1,5 +1,6 @@
 package project;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import java.util.Random;
 import static java.lang.Math.sqrt;
@@ -34,11 +35,7 @@ public class BoundedMap extends AbstractWorldMap implements IWorldMap{
 
 
     @Override
-    public void positionChanged() {
-    }
-
-    @Override
-    public void positionChanged(GridPane grid, AbstractWorldMap map) {
+    public void positionChanged(GridPane grid, AbstractWorldMap map, SimulationEngine engine, VBox statistics) {
 
     }
 }
