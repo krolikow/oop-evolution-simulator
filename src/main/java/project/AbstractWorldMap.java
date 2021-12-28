@@ -1,7 +1,5 @@
 package project;
 
-import project.statictics.StatisticsConverter;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,10 +12,9 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     protected Vector2d upperRight, lowerLeft, lowerLeftJungle, upperRightJungle;
     protected double jungleRatio;
     protected ArrayList<Animal> animalsList = new ArrayList<>();
-    protected ConcurrentHashMap<ArrayList<Integer>,Integer> allGenotypes = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<ArrayList<Integer>, Integer> allGenotypes = new ConcurrentHashMap<>();
     protected int lifeSpanSum = 0;
     protected int deadAnimalsAmount = 0;
-
 
 
     @Override
@@ -33,13 +30,12 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         return objectAt(position) != null;
     }
 
-    public void updateAllGenotypes(ArrayList<Integer> genotype){
-        if (!this.allGenotypes.containsKey(genotype)){
-            this.allGenotypes.put(genotype,1);
-        }
-        else{
+    public void updateAllGenotypes(ArrayList<Integer> genotype) {
+        if (!this.allGenotypes.containsKey(genotype)) {
+            this.allGenotypes.put(genotype, 1);
+        } else {
             int currentAmountOfSuchGenotypes = this.allGenotypes.get(genotype);
-            this.allGenotypes.put(genotype,currentAmountOfSuchGenotypes+1);
+            this.allGenotypes.put(genotype, currentAmountOfSuchGenotypes + 1);
         }
     }
 
@@ -51,16 +47,16 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         return (position.follows(this.getLowerLeftJungle())) && (position.precedes(this.getUpperRightJungle()));
     }
 
-    public boolean isOffTheMap(Vector2d position){
-        return ((position.x >= this.width)||(position.y>=height)||(position.x<0)||(position.y<0));
+    public boolean isOffTheMap(Vector2d position) {
+        return ((position.x >= this.width) || (position.y >= height) || (position.x < 0) || (position.y < 0));
     }
 
-    public boolean isXInBounds(Vector2d position){
-        return ((position.x>=0)&&(position.x<this.width));
+    public boolean isXInBounds(Vector2d position) {
+        return ((position.x >= 0) && (position.x < this.width));
     }
 
-    public boolean isYInBounds(Vector2d position){
-        return ((position.y>=0)&&(position.y<this.height));
+    public boolean isYInBounds(Vector2d position) {
+        return ((position.y >= 0) && (position.y < this.height));
     }
 
     @Override
@@ -118,11 +114,11 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         return (animals.get(position) == null) || (animals.get(position).size() == 0);
     }
 
-    public void updateDeadAnimals(){
-        this.deadAnimalsAmount +=1;
+    public void updateDeadAnimals() {
+        this.deadAnimalsAmount += 1;
     }
 
-    public void updateLifeSpan(Animal animal){
+    public void updateLifeSpan(Animal animal) {
         this.lifeSpanSum += animal.getEpoch();
     }
 
@@ -145,12 +141,12 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
             removeAnimalFromAnimals(deadBody, deadBody.getPosition());
         }
 
-        for(Animal deadBody : bodiesToRemoveList) {
+        for (Animal deadBody : bodiesToRemoveList) {
             bodiesToRemoveList.remove(deadBody);
         }
     }
 
-    public void newDay(){
+    public void newDay() {
         for (Vector2d position : animals.keySet()) {
             for (Animal animal : animals.get(position)) {
                 animal.incrementEpoch();
@@ -224,11 +220,16 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     // EATING
 
     public void divideAndEat(List<Animal> feastingAnimals) {
+        List<Animal> animalsToUpdate = new ArrayList<>();
         int toDivideFor = feastingAnimals.size();
         for (Animal animal : feastingAnimals) {
             animal.setEnergy(animal.getEnergy() + (int) Math.floor((float) this.plantEnergy / toDivideFor));
-//            removeAnimalFromAnimals(animal,animal.getPosition());
-//            addAnimalToAnimals(animal,animal.getPosition());
+            animalsToUpdate.add(animal);
+        }
+
+        for (Animal animal : animalsToUpdate) {
+            removeAnimalFromAnimals(animal,animal.getPosition());
+            addAnimalToAnimals(animal,animal.getPosition());
         }
     }
 
@@ -249,7 +250,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
                 continue;
             }
             List<Animal> feastingAnimals = this.getFeastingAnimals(grassPosition);
-            System.out.println(feastingAnimals.size());
             this.divideAndEat(feastingAnimals);
             grassToRemove.add(grass.get(grassPosition));
         }
@@ -260,22 +260,22 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
     }
 
-     // PLANTS
+    // PLANTS
 
-     public void addPlantInJungle() {
-         int n = heightJungle * widthJungle;
-         Random random = new Random();
-         for (int i = 0; i <= n; i++) {
-             int randomX = random.nextInt(upperRightJungle.x + 1 - lowerLeftJungle.x) + lowerLeftJungle.x;
-             int randomY = (int) ((Math.random() * (upperRightJungle.y + 1 - lowerLeftJungle.y)) + lowerLeftJungle.y);
-             Grass newGrass = new Grass(new Vector2d(randomX, randomY));
+    public void addPlantInJungle() {
+        int n = heightJungle * widthJungle;
+        Random random = new Random();
+        for (int i = 0; i <= n; i++) {
+            int randomX = random.nextInt(upperRightJungle.x + 1 - lowerLeftJungle.x) + lowerLeftJungle.x;
+            int randomY = (int) ((Math.random() * (upperRightJungle.y + 1 - lowerLeftJungle.y)) + lowerLeftJungle.y);
+            Grass newGrass = new Grass(new Vector2d(randomX, randomY));
 
-             if ((objectAt(newGrass.getPosition()) == null)) {
-                 grass.put(newGrass.getPosition(), newGrass);
-                 return;
-             }
-         }
-     }
+            if ((objectAt(newGrass.getPosition()) == null)) {
+                grass.put(newGrass.getPosition(), newGrass);
+                return;
+            }
+        }
+    }
 
 
     public void addPlantInSteppe() {
@@ -323,7 +323,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     }
 
 
-
     // GETTERS & SETTERS
 
     public int getWidth() {
@@ -358,7 +357,6 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     public Vector2d getUpperRightJungle() {
         return upperRightJungle;
     }
-
 
 
     @Override

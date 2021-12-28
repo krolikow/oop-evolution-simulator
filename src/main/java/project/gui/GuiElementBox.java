@@ -1,5 +1,7 @@
 package project.gui;
 
+import javafx.scene.control.Label;
+import javafx.scene.text.Font;
 import project.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,9 +33,10 @@ public class GuiElementBox {
         loadImages();
     }
 
-    public VBox setImages(IMapElement element) {
+    public VBox setImages(AbstractWorldMapElement element) {
 
         ImageView elementView;
+        Label elementLabel;
 
         if (element instanceof Animal) {
             elementView = switch (((Animal)element).getDirection()) {
@@ -49,13 +52,15 @@ public class GuiElementBox {
 
         } else {
             elementView = new ImageView(imageCarrot);
+            elementLabel = new Label("");
         }
-        elementView.setFitWidth(40);
-        elementView.setFitHeight(40);
+        elementView.setFitWidth(30);
+        elementView.setFitHeight(30);
         VBox elementVBox = new VBox();
-        elementVBox.getChildren().addAll(elementView);
+        elementLabel.setAlignment(Pos.TOP_CENTER);
+        elementLabel.setFont(new Font("Arial",12));
+        elementVBox.getChildren().addAll(elementView,elementLabel);
         elementVBox.setAlignment(Pos.CENTER);
-
         return elementVBox;
 
     }

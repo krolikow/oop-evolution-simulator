@@ -71,8 +71,15 @@ public class SimulationEngine implements IEngine, Runnable {
             }
         }
         int allAnimals = this.getAllAnimalsNumber(map);
-        StatisticsPanel.averageEnergyLevel.put(days, energySum / allAnimals);
-        return (double) energySum / allAnimals;
+        if(allAnimals>0){
+            StatisticsPanel.averageEnergyLevel.put(days, energySum / allAnimals);
+            return (double) energySum / allAnimals;
+        }
+        else{
+            StatisticsPanel.averageEnergyLevel.put(days, 0);
+            return 0;
+        }
+
     }
 
     public double getAverageLifeSpan(AbstractWorldMap map) {
@@ -97,9 +104,14 @@ public class SimulationEngine implements IEngine, Runnable {
                 }
             }
         }
-        StatisticsPanel.averageChildrenAmount.put(days, childrenAmount / livingAnimals);
-
-        return childrenAmount / livingAnimals;
+        if (livingAnimals > 0) {
+            StatisticsPanel.averageChildrenAmount.put(days, childrenAmount / livingAnimals);
+            return childrenAmount / livingAnimals;
+        }
+        else{
+            StatisticsPanel.averageChildrenAmount.put(days, 0);
+            return 0;
+        }
     }
 
     public int getDays() {
@@ -107,7 +119,7 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public String getGenotypeDominant(AbstractWorldMap map) {
-        ArrayList<Integer> mostCommonGenotype = (ArrayList<Integer>) map.allGenotypes.keySet().toArray()[0];
+        ArrayList<Integer> mostCommonGenotype = new ArrayList<>(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0));
         int frequency = -1;
         for (Map.Entry<ArrayList<Integer>, Integer> entity : map.allGenotypes.entrySet()) {
             if (entity.getValue() > frequency) {
@@ -179,9 +191,4 @@ public class SimulationEngine implements IEngine, Runnable {
         this.observers.add(observer);
     }
 }
-
-
-
-
-
 

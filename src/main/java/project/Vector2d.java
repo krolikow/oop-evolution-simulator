@@ -30,19 +30,6 @@ public class Vector2d {
     }
 
 
-
-    public Vector2d upperRight(Vector2d that) {
-        return new Vector2d(Math.max(this.x, that.x), Math.max(this.y, that.y));
-    }
-
-
-
-    public Vector2d lowerLeft(Vector2d that) {
-        return new Vector2d(Math.min(this.x, that.x), Math.min(this.y, that.y));
-    }
-
-
-
     public Vector2d add(Vector2d other) {
         return new Vector2d(this.x + other.x, this.y + other.y);
     }
@@ -68,10 +55,6 @@ public class Vector2d {
     @Override
     public int hashCode() {
         return Objects.hash(this.x, this.y);
-    }
-
-    public Vector2d opposite() {
-        return new Vector2d(-this.x, -this.y);
     }
 
 }

@@ -2,8 +2,6 @@ package project;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-import java.util.Random;
-import static java.lang.Math.sqrt;
 
 public class BoundedMap extends AbstractWorldMap implements IWorldMap{
 

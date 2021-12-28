@@ -12,13 +12,13 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class Menu extends Application {
-    private final TextField height = new TextField();
-    private final TextField width = new TextField();
-    private final TextField startEnergy =new TextField();
-    private final TextField moveEnergy=new TextField();
-    private final TextField plantEnergy=new TextField();
-    private final TextField jungleRatio=new TextField();
-    private final TextField initialNumberOfAnimals=new TextField();
+    private final TextField height = new TextField("10");
+    private final TextField width = new TextField("10");
+    private final TextField startEnergy = new TextField("30");
+    private final TextField moveEnergy = new TextField("3");
+    private final TextField plantEnergy = new TextField("8");
+    private final TextField jungleRatio = new TextField("0.5");
+    private final TextField initialNumberOfAnimals = new TextField("40");
 
     private final Label heightLabel = new Label("Height of map:  ");
     private final Label widthLabel = new Label("Width of map:  ");
@@ -74,12 +74,12 @@ public class Menu extends Application {
 
         Button submitButton = new Button("Submit");
         submitButton.setOnAction((e) -> {
-            Game game = new Game(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()),
+            Simulation game = new Simulation(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()),
                     Integer.parseInt(startEnergy.getText()), Integer.parseInt(moveEnergy.getText()),
                     Integer.parseInt(plantEnergy.getText()), Double.parseDouble(jungleRatio.getText()),
                     Integer.parseInt(initialNumberOfAnimals.getText()));
-            try
-            {
+
+            try {
                 game.start(primaryStage);
                 myStage.hide();
             } catch (Exception ex) {
@@ -87,7 +87,8 @@ public class Menu extends Application {
             }
         });
 
-        menu.getChildren().addAll(mainLabel, heightHBox, widthHBox, startEnergyHBox, moveEnergyHBox, plantEnergyHBox, jungleRatioHBox, initialNumberOfAnimalsHBox, submitButton);
+        menu.getChildren().addAll(mainLabel, heightHBox, widthHBox, startEnergyHBox, moveEnergyHBox, plantEnergyHBox,
+                jungleRatioHBox, initialNumberOfAnimalsHBox, submitButton);
         menu.setAlignment(Pos.CENTER);
     }
 

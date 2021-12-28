@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 import project.*;
 import project.statictics.StatisticsPanel;
 
-public class Game extends Application implements IPositionChangeObserver {
+public class Simulation extends Application implements IPositionChangeObserver {
     private AbstractWorldMap boundedMap;
     private AbstractWorldMap unboundedMap;
     private SimulationEngine engineBMap;
@@ -28,12 +28,12 @@ public class Game extends Application implements IPositionChangeObserver {
     private final VBox chartBoxUBMap = new VBox();
     private final VBox statisticsBoxBoundedMap = new VBox();
     private final VBox statisticsBoxUnboundedMap = new VBox();
-    private Button saveStatisticsButtonBoundedMap = new Button("Save statistics");
-    private Button saveStatisticsButtonUnboundedMap = new Button("Save statistics");
-    private int width, height, startEnergy, moveEnergy, plantEnergy, initialNumberOfAnimals;
-    private double jungleRatio;
+    private final Button saveStatisticsButtonBoundedMap = new Button("Save statistics");
+    private final Button saveStatisticsButtonUnboundedMap = new Button("Save statistics");
+    private final int width, height, startEnergy, moveEnergy, plantEnergy, initialNumberOfAnimals;
+    private final double jungleRatio;
 
-    public Game(int width, int height, int startEnergy, int moveEnergy, int plantEnergy, double jungleRatio, int initialNumberOfAnimals) {
+    public Simulation(int width, int height, int startEnergy, int moveEnergy, int plantEnergy, double jungleRatio, int initialNumberOfAnimals) {
         this.width = width;
         this.height = height;
         this.startEnergy = startEnergy;

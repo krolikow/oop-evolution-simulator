@@ -9,20 +9,10 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
     private MapDirection direction;
     private Vector2d position;
     private final AbstractWorldMap map;
-    private int energy,moveEnergy,epoch, childrenAmount;
+    private int energy,epoch,childrenAmount;
     private ArrayList<Integer> genotype;
     private final ArrayList<IPositionChangeObserver> observers = new ArrayList<>();
 
-    public Animal(AbstractWorldMap map,int startEnergy,int moveEnergy,Vector2d position,ArrayList<Integer> genotype){
-        this.map =  map;
-        this.position = position;
-        this.direction = setDirection();
-        this.energy = startEnergy;
-        this.moveEnergy = moveEnergy;
-        this.epoch = 0;
-        this.childrenAmount = 0;
-        this.genotype = genotype;
-    }
 
     public Animal(AbstractWorldMap map,int startEnergy,Vector2d position){
         this.map =  map;
@@ -30,6 +20,7 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         this.direction = setDirection();
         this.energy = startEnergy;
         this.epoch = 0;
+        this.childrenAmount = 0;
         this.genotype = setGenotype();
     }
 
@@ -116,8 +107,8 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
                 Vector2d newPosition = this.position.add(this.direction.toUnitVector());
                 newPosition = this.map.canMoveTo(this.position,newPosition);
                 if (!(newPosition.equals(this.position))){
-                    this.energy -= moveEnergy;
                     positionChanged(this,this.position, newPosition);
+                    this.energy = Math.max(this.energy - map.moveEnergy,0);
                 }
                 this.position = newPosition;
             }
@@ -125,15 +116,15 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
                 Vector2d newPosition = this.position.subtract(this.direction.toUnitVector());
                 newPosition = this.map.canMoveTo(this.position,newPosition);
                 if (!(newPosition.equals(this.position))){
-                    this.energy -= moveEnergy;
                     positionChanged(this,this.position, newPosition);
+                    this.energy = Math.max(this.energy - map.moveEnergy,0);
                 }
                 this.position = newPosition;
 
             }
             case 1,2,3,5,6,7 -> {
-                this.energy -= moveEnergy;
                 turn(direction);
+                this.energy = Math.max(this.energy - map.moveEnergy,0);
             }
         }
     }
