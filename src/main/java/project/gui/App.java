@@ -1,7 +1,6 @@
 package project.gui;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import project.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -10,32 +9,42 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import project.statictics.StatPanel;
 
 public class App extends Application implements IPositionChangeObserver {
-    private AbstractWorldMap map;
-    private SimulationEngine engine;
-    private TextField height,width,startEnergy,moveEnergy,plantEnergy,jungleRatio,initialNumberOfAnimals;
-    private final GridPane grid = new GridPane();
-    GuiElementBox elementCreator = new GuiElementBox();
-    private StatPanel statPanel;
+    private AbstractWorldMap boundedMap;
+    private AbstractWorldMap unboundedMap;
+    private SimulationEngine engineBMap;
+    private SimulationEngine engineUBMap;
+    private final GridPane gridB = new GridPane();
+    private final GridPane gridUB = new GridPane();
+    private final GuiElementBox elementCreator = new GuiElementBox();
+    private StatPanel statisticsPanelBMap;
+    private StatPanel statisticsPanelUBMap;
+    private final VBox chartBoxBMap = new VBox();
+    private final VBox chartBoxUBMap = new VBox();
+    private Menu menu;
 
     @Override
     public void init() {
 
         try{
-            statPanel = new StatPanel();
-            this.map = new BoundedMap(10,10,7,10,2,0.5,10);
-            this.engine = new SimulationEngine(this.map, 300,true,statPanel);
-            this.engine.addObserver(this);
+            this.menu = new Menu();
+            this.statisticsPanelBMap = new StatPanel();
+            this.statisticsPanelUBMap = new StatPanel();
+            this.boundedMap = new BoundedMap(10,10,7,10 ,2,0.5,10);
+            this.unboundedMap = new BoundedMap(10,10,7,10 ,2,0.5,10);
+            this.engineBMap = new SimulationEngine(this.boundedMap, 300,true, statisticsPanelBMap,gridB);
+            this.engineBMap.addObserver(this);
+            this.engineUBMap = new SimulationEngine(this.unboundedMap, 300,true, statisticsPanelUBMap,gridUB);
+            this.engineUBMap.addObserver(this);
         }
 
 //        try{
 //            this.map = new BoundedMap(
-//                    Integer.parseInt(this.height.getText()),
+//                    Integer.parseInt(menu.height.getText()),
 //                    Integer.parseInt(this.width.getText()),
 //                    Integer.parseInt(this.moveEnergy.getText()),
 //                    Integer.parseInt(this.plantEnergy.getText()),
@@ -52,11 +61,11 @@ public class App extends Application implements IPositionChangeObserver {
         }
     }
 
-    public void initializeGrid(){
-        this.grid.setGridLinesVisible(false);
-        this.grid.setGridLinesVisible(true);
-        this.grid.getRowConstraints().clear();
-        this.grid.getColumnConstraints().clear();
+    public void initializeGrid(GridPane grid,AbstractWorldMap map){
+        grid.setGridLinesVisible(false);
+        grid.setGridLinesVisible(true);
+        grid.getRowConstraints().clear();
+        grid.getColumnConstraints().clear();
 
         int width = map.getWidth();
         int height = map.getHeight();
@@ -76,6 +85,7 @@ public class App extends Application implements IPositionChangeObserver {
             grid.add(yAxis, 0, i, 1, 1);
         }
         Pane statPane = new Pane();
+//        statPane.getChildren().add(statPanel);
 //        statPane.setMaxWidth(400);
 //        statPane.setMinWidth(400);
 //        statPane.maxHeight(400);
@@ -101,70 +111,108 @@ public class App extends Application implements IPositionChangeObserver {
             }
         }
 
-
         Label label = new Label("y\\x");
         grid.add(label, 0, 0, 1, 1);
         grid.getColumnConstraints().add(new ColumnConstraints(40));
         grid.getRowConstraints().add(new RowConstraints(40));
         GridPane.setHalignment(label, HPos.CENTER);
     }
+    Button stopButtonBMap = new Button("Stop");
+    Button startButtonBMap = new Button("Start");
+    Button stopButtonUBMap = new Button("Stop");
+    Button startButtonUBMap = new Button("Start");
 
-    Button stopButton = new Button("Stop");
-    public HBox createHBoxInterface() {
-        this.width = new TextField();
-        this.height = new TextField();
-        this.startEnergy = new TextField();
-        this.moveEnergy = new TextField();
-        this.plantEnergy = new TextField();
-        this.jungleRatio = new TextField();
 
-        Button startButton = new Button("Start");
 
-        /*HBox hBoxInterface = new HBox(startButton,stopButton,width,height,startEnergy,moveEnergy,plantEnergy,jungleRatio);*/
+    public HBox createHBoxInterface(Button startButton,Button stopButton,SimulationEngine engine) {
+
         HBox hBoxInterface = new HBox(startButton,stopButton);
         hBoxInterface.setAlignment(Pos.CENTER);
 
-        startButton.setOnAction(click -> {
-            Thread engineThread  = new Thread(this.engine);
+        startButton.setOnAction(click -> {Thread engineThread  = new Thread(engine);
             engineThread.start();
             engine.setIsON();
         });
 
-
-
         return hBoxInterface;
     }
+
 
     @Override
     public void positionChanged(Animal animal, Vector2d oldPosition, Vector2d newPosition) {}
 
     @Override
     public void positionChanged() {
+
+    }
+
+//    @Override
+//    public void positionChanged() {
+//        Platform.runLater(() -> {
+//            gridB.getChildren().clear();
+//            initializeGrid(gridB,unboundedMap);
+//        });
+//
+//        Platform.runLater(() -> {
+//            gridUB.getChildren().clear();
+//            initializeGrid(gridUB,boundedMap);
+//        });
+//    }
+
+
+    @Override
+    public void positionChanged(GridPane grid, AbstractWorldMap map) {
         Platform.runLater(() -> {
-            this.grid.getChildren().clear();
-            initializeGrid();
+            grid.getChildren().clear();
+            initializeGrid(grid,map);
         });
     }
 
     @Override
     public void start(Stage primaryStage) {
-        this.grid.setGridLinesVisible(true);
-        HBox hBoxInterface = createHBoxInterface();
-        initializeGrid();
-        VBox vBoxInterface = new VBox(hBoxInterface, this.grid);
-        vBoxInterface.setAlignment(Pos.CENTER);
+        this.gridUB.setGridLinesVisible(true);
+        this.gridB.setGridLinesVisible(true);
+
+        HBox hBoxInterfaceB = createHBoxInterface(startButtonBMap,stopButtonBMap,engineBMap);
+        initializeGrid(gridB,boundedMap);
+
+        HBox hBoxInterfaceUB = createHBoxInterface(startButtonUBMap,stopButtonUBMap,engineUBMap);
+        initializeGrid(gridUB,unboundedMap);
 
         try {
-            statPanel.start(primaryStage);
+            statisticsPanelBMap.start(primaryStage);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        stopButton.setOnAction(click ->{
 
-            engine.switchON();
+        try {
+            statisticsPanelUBMap.start(primaryStage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            menu.start(primaryStage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        chartBoxUBMap.getChildren().addAll(this.statisticsPanelUBMap.getChart());
+        chartBoxBMap.getChildren().addAll(this.statisticsPanelBMap.getChart());
+        HBox hBoxInterface = new HBox(hBoxInterfaceB,hBoxInterfaceUB, this.gridB,this.gridUB, chartBoxBMap,chartBoxUBMap);
+        hBoxInterface.setAlignment(Pos.CENTER);
+        stopButtonBMap.setOnAction(click ->{
+            engineBMap.switchON();
         });
 
-        primaryStage.setScene(new Scene(vBoxInterface));
+        stopButtonUBMap.setOnAction(click ->{
+            engineUBMap.switchON();
+        });
+
+
+        primaryStage.setScene(new Scene(hBoxInterface));
+        primaryStage.setTitle("Evolution Simulator");
+        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 }

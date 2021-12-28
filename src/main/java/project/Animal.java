@@ -107,18 +107,6 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         this.direction = temporaryDirection;
     }
 
-    public Vector2d teleport(Vector2d position){ //bedzie wywolywana jezeli zwierze bedzie mialo zamiar wyjsc poza mapę
-        if ((position.x>=this.map.width)&&(this.map.isYInBounds(position))) return new Vector2d(0,position.y);
-        else if ((position.x<0)&&(this.map.isYInBounds(position))) return new Vector2d(this.map.width-1,position.y);
-        else if ((position.y<0)&&(this.map.isXInBounds(position))) return new Vector2d(position.x,this.map.height -1);
-        else if ((position.y>=this.map.height)&&(this.map.isXInBounds(position))) return new Vector2d(position.x,0);
-        else if ((position.x>=this.map.width)&&((position.y>=this.map.height))) return new Vector2d(0,0);
-        else if ((position.x<0)&&((position.y<0))) return new Vector2d(this.map.width-1,this.map.height-1);
-        else if ((position.x<0)&&(position.y>=this.map.height)) return new Vector2d(this.map.width-1,0);
-        else if ((position.x>=this.map.width)&&((position.y<0))) return new Vector2d(0,this.map.height-1);
-        else return position;
-    }
-
 
     public void move() {
         int direction = generateMoveDirection();
@@ -126,20 +114,21 @@ public class Animal extends AbstractWorldMapElement implements IMapElement{
         switch (direction) {
             case 0 -> {
                 Vector2d newPosition = this.position.add(this.direction.toUnitVector());
-                if (this.map.canMoveTo(newPosition)){
+                newPosition = this.map.canMoveTo(this.position,newPosition);
+                if (!(newPosition.equals(this.position))){
                     this.energy -= moveEnergy;
                     positionChanged(this,this.position, newPosition);
-                    this.position = newPosition;
-
                 }
+                this.position = newPosition;
             }
             case 4 -> {
                 Vector2d newPosition = this.position.subtract(this.direction.toUnitVector());
-                if (this.map.canMoveTo(newPosition)) {
+                newPosition = this.map.canMoveTo(this.position,newPosition);
+                if (!(newPosition.equals(this.position))){
                     this.energy -= moveEnergy;
                     positionChanged(this,this.position, newPosition);
-                    this.position = newPosition;
                 }
+                this.position = newPosition;
 
             }
             case 1,2,3,5,6,7 -> {

@@ -7,7 +7,9 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StatPanel extends Application {
@@ -25,24 +27,7 @@ public class StatPanel extends Application {
         NumberAxis x = new NumberAxis();
         NumberAxis y = new NumberAxis();
         chart = new LineChart(x,y);
-        chart.setTitle("Wykres");
-        XYChart.Series<Integer,Integer> seria = new XYChart.Series<>();
-        seria.getData().add(new XYChart.Data<>(1,2));
-        seria.getData().add(new XYChart.Data<>(3,4));
-        seria.getData().add(new XYChart.Data<>(10,20));
-        seria.getData().add(new XYChart.Data<>(12,24));
-        seria.getData().add(new XYChart.Data<>(10,217));
-        seria.getData().add(new XYChart.Data<>(14,34));
-        seria.getData().add(new XYChart.Data<>(16,28));
-
-//        chart.getData().add(seria);
         prepareData();
-        Scene scene = new Scene(chart,500,500);
-        Stage myStage = new Stage();
-        myStage.setTitle("Statistics");
-
-        myStage.setScene(scene);
-        myStage.show();
 
         chart.getData().add(animalNumberChart);
         chart.getData().add(plantNumberChart);
@@ -87,8 +72,10 @@ public class StatPanel extends Application {
             averageChildrenAmountChart.getData().add(new XYChart.Data<>(enitity.getKey(),enitity.getValue()));
             StatPanel.averageChildrenAmount.remove(enitity.getKey());
         }
+    }
 
-
+    public LineChart<Integer,Integer> getChart(){
+        return this.chart;
     }
 
 }

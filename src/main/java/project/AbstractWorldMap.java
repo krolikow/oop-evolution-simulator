@@ -42,9 +42,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     }
 
     @Override
-    public boolean canMoveTo(Vector2d position) {
-        return (0 <= position.x) && (position.x <= width - 1) && (0 <= position.y) && (position.y <= height - 1);
-    }
+    public abstract Vector2d canMoveTo(Vector2d oldPosition, Vector2d newPosition);
 
 
     public boolean isInJungle(Vector2d position) {
@@ -66,7 +64,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     @Override
     public boolean placeAnimal(Animal animal) {
         Vector2d position = animal.getPosition();
-        if (canMoveTo(position)) {
+        if (!(this.isOffTheMap(position))) {
             this.addAnimalToAnimals(animal, position);
             this.animalsList.add(animal);
             animal.addObserver(this);
@@ -127,7 +125,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     }
 
 
-    public void removeDeadBodies() {
+    public void removeDeadBodies() { // FIXME concurrent
         List<Animal> bodiesToRemove = new LinkedList<>();
         for (Vector2d animalsPosition : animals.keySet()) {
             for (Animal potentiallyDeadAnimal : animals.get(animalsPosition)) {
@@ -135,7 +133,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
                     this.updateLifeSpan(potentiallyDeadAnimal);
                     this.updateDeadAnimals();
                     bodiesToRemove.add(potentiallyDeadAnimal);
-                    this.animalsList.remove(potentiallyDeadAnimal);
+//                    this.animalsList.remove(potentiallyDeadAnimal);
                 }
             }
         }

@@ -2,6 +2,7 @@
 package project;
 
 import javafx.application.Platform;
+import javafx.scene.layout.GridPane;
 import project.statictics.StatPanel;
 
 import static java.lang.System.out;
@@ -16,13 +17,15 @@ public class SimulationEngine implements IEngine, Runnable {
     boolean isON;
     int days = 0;
     private StatPanel statPanel;
+    private GridPane grid;
 
 
-    public SimulationEngine(AbstractWorldMap map, int moveDelay, boolean isON, StatPanel statPanel) {
+    public SimulationEngine(AbstractWorldMap map, int moveDelay, boolean isON, StatPanel statPanel, GridPane grid) {
         this.map = map;
         this.moveDelay = moveDelay;
         this.isON = isON;
         this.statPanel = statPanel;
+        this.grid = grid;
     }
 
 
@@ -100,7 +103,7 @@ public class SimulationEngine implements IEngine, Runnable {
 
     public void run() {
         for (IPositionChangeObserver animalMoveObserver : this.observers)
-            animalMoveObserver.positionChanged();
+            animalMoveObserver.positionChanged(this.grid,this.map);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
@@ -112,7 +115,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 map.removeDeadBodies();
                 map.moving();
                 for (IPositionChangeObserver animalMoveObserver : this.observers)
-                    animalMoveObserver.positionChanged();
+                    animalMoveObserver.positionChanged(this.grid,this.map);
 
                 map.eating();
                 map.reproduction();

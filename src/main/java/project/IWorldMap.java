@@ -3,7 +3,7 @@ package project;
 import java.util.Map;
 public interface IWorldMap {
 
-    boolean canMoveTo(Vector2d position);
+    Vector2d canMoveTo(Vector2d oldPosition,Vector2d newPosition);
 
     boolean placeAnimal(Animal animal);
 
