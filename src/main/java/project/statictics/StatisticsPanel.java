@@ -6,26 +6,34 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 public class StatisticsPanel extends Application {
-    public static ConcurrentHashMap<Integer, Integer> animalNumber = new ConcurrentHashMap<>(), plantNumber = new ConcurrentHashMap<>(),
-            averageEnergyLevel = new ConcurrentHashMap<>(), averageLifeSpan = new ConcurrentHashMap<>(), averageChildrenAmount = new ConcurrentHashMap<>();
-    private LineChart<Integer, Integer> chart;
-    XYChart.Series<Integer, Integer> averageChildrenAmountChart = new XYChart.Series<>();
-    XYChart.Series<Integer, Integer> animalNumberChart = new XYChart.Series<>();
-    XYChart.Series<Integer, Integer> plantNumberChart = new XYChart.Series<>();
-    XYChart.Series<Integer, Integer> averageEnergyLevelChart = new XYChart.Series<>();
-    XYChart.Series<Integer, Integer> averageLifeSpanChart = new XYChart.Series<>();
+    private final int animalNumber;
+    private final int averageChildrenAmount;
+    private final int plantNumber;
+    private final int averageEnergyLevel;
+    private final int averageLifeSpan;
+    private LineChart<Integer, Double> chart;
+    XYChart.Series<Integer, Double> averageChildrenAmountChart = new XYChart.Series<>();
+    XYChart.Series<Integer, Double> animalNumberChart = new XYChart.Series<>();
+    XYChart.Series<Integer, Double> plantNumberChart = new XYChart.Series<>();
+    XYChart.Series<Integer, Double> averageEnergyLevelChart = new XYChart.Series<>();
+    XYChart.Series<Integer, Double> averageLifeSpanChart = new XYChart.Series<>();
 
+
+    public StatisticsPanel(int animalNumber, int averageChildrenAmount, int plantNumber, int averageEnergyLevel, int averageLifeSpan) {
+        this.animalNumber = animalNumber;
+        this.averageChildrenAmount = averageChildrenAmount;
+        this.plantNumber = plantNumber;
+        this.averageEnergyLevel = averageEnergyLevel;
+        this.averageLifeSpan = averageLifeSpan;
+    }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         NumberAxis x = new NumberAxis();
         NumberAxis y = new NumberAxis();
         chart = new LineChart(x, y);
-        prepareData();
+        prepareData(0, animalNumber, averageChildrenAmount, plantNumber, averageEnergyLevel, averageLifeSpan);
 
         chart.getData().add(animalNumberChart);
         chart.getData().add(plantNumberChart);
@@ -34,44 +42,26 @@ public class StatisticsPanel extends Application {
         chart.getData().add(averageLifeSpanChart);
     }
 
-
-    public void prepareData() {
-
+    public void prepareData(int currentEpoch, int animalNumber, int averageChildrenAmount, int plantNumber,
+                            double averageEnergyLevel, double averageLifeSpan) {
         animalNumberChart.setName("Animal number");
-        for (Map.Entry<Integer, Integer> entity : StatisticsPanel.animalNumber.entrySet()) {
-            animalNumberChart.getData().add(new XYChart.Data<>(entity.getKey(), entity.getValue()));
-            StatisticsPanel.animalNumber.remove(entity.getKey());
-        }
-
+        animalNumberChart.getData().add(new XYChart.Data<>(currentEpoch, (double) animalNumber));
 
         plantNumberChart.setName("Plant number");
-        for (Map.Entry<Integer, Integer> entity : StatisticsPanel.plantNumber.entrySet()) {
-            plantNumberChart.getData().add(new XYChart.Data<>(entity.getKey(), entity.getValue()));
-            StatisticsPanel.plantNumber.remove(entity.getKey());
-        }
-
+        plantNumberChart.getData().add(new XYChart.Data<>(currentEpoch, (double) plantNumber));
 
         averageEnergyLevelChart.setName("Average energy level");
-        for (Map.Entry<Integer, Integer> entity : StatisticsPanel.averageEnergyLevel.entrySet()) {
-            averageEnergyLevelChart.getData().add(new XYChart.Data<>(entity.getKey(), entity.getValue()));
-            StatisticsPanel.averageEnergyLevel.remove(entity.getKey());
-        }
-
+        averageEnergyLevelChart.getData().add(new XYChart.Data<>(currentEpoch, averageEnergyLevel));
 
         averageLifeSpanChart.setName("Average life span");
-        for (Map.Entry<Integer, Integer> entity : StatisticsPanel.averageLifeSpan.entrySet()) {
-            averageLifeSpanChart.getData().add(new XYChart.Data<>(entity.getKey(), entity.getValue()));
-            StatisticsPanel.averageLifeSpan.remove(entity.getKey());
-        }
-
+        averageLifeSpanChart.getData().add(new XYChart.Data<>(currentEpoch, averageLifeSpan));
 
         averageChildrenAmountChart.setName("Average children amount");
-        for (Map.Entry<Integer, Integer> entity : StatisticsPanel.averageChildrenAmount.entrySet()) {
-            averageChildrenAmountChart.getData().add(new XYChart.Data<>(entity.getKey(), entity.getValue()));
-            StatisticsPanel.averageChildrenAmount.remove(entity.getKey());
-        }
+        averageChildrenAmountChart.getData().add(new XYChart.Data<>(currentEpoch, (double) averageChildrenAmount));
+
     }
 
-    public LineChart<Integer, Integer> getChart() {return this.chart;
+    public LineChart<Integer, Double> getChart() {
+        return this.chart;
     }
 }

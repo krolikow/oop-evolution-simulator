@@ -13,14 +13,13 @@ public class SimulationEngine implements IEngine, Runnable {
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
     private final int moveDelay;
     private int magicTricks;
-    private int days = 0;
+    private int currentEpoch = 0;
     private boolean isON, isMagic;
     private final StatisticsPanel statisticsPanel;
     private final GridPane grid;
     private final VBox statistics;
     private final StatisticsConverter statisticsConverter;
     private final List<Double> averageData = Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0);
-
 
     public SimulationEngine(AbstractWorldMap map, int moveDelay, boolean isON, StatisticsPanel statPanel, GridPane grid, VBox statistics) {
         this.map = map;
@@ -39,7 +38,7 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public void doMagicTrick() {
-        if ((this.isMagic) && (this.getMagicTricksNumber() > 0) && (this.getAllAnimalsNumber(this.map) == 5)) {
+        if ((this.isMagic) && (this.getMagicTricksNumber() > 0) && (this.getAllAnimalsNumber() == 5)) {
             for (int i = 0; i < 5; i++) {
                 this.map.place(this.map.copyAnimal());
             }
@@ -65,27 +64,25 @@ public class SimulationEngine implements IEngine, Runnable {
         this.isON = true;
     }
 
-    public int getMagicTricksNumber(){
+    public int getMagicTricksNumber() {
         return this.magicTricks;
     }
 
-    public int getAllAnimalsNumber(AbstractWorldMap map) {
+    public int getAllAnimalsNumber() {
         int result = 0;
         for (Vector2d position : map.animals.keySet()) {
             if (map.animals.get(position) != null) {
                 result += map.animals.get(position).size();
             }
         }
-        StatisticsPanel.animalNumber.put(days, result);
         return result;
     }
 
-    public int getAllPlantsNumber(AbstractWorldMap map) {
-        StatisticsPanel.plantNumber.put(days, map.grass.size());
+    public int getAllPlantsNumber() {
         return map.grass.size();
     }
 
-    public double getAverageEnergyLevel(AbstractWorldMap map) {
+    public double getAverageEnergyLevel() {
         int energySum = 0;
         for (HashMap.Entry<Vector2d, LinkedList<Animal>> entry : map.animals.entrySet()) {
             if (entry.getValue() != null) {
@@ -95,32 +92,28 @@ public class SimulationEngine implements IEngine, Runnable {
 
             }
         }
-        int allAnimals = this.getAllAnimalsNumber(map);
+        int allAnimals = this.getAllAnimalsNumber();
         if (allAnimals > 0) {
-            StatisticsPanel.averageEnergyLevel.put(days, energySum / allAnimals);
             return (double) energySum / allAnimals;
         } else {
-            StatisticsPanel.averageEnergyLevel.put(days, 0);
             return 0;
         }
 
     }
 
-    public double getAverageLifeSpan(AbstractWorldMap map) {
+    public double getAverageLifeSpan() {
         int lifeSpanSum = map.lifeSpanSum;
         int deadAnimalsAmount = map.deadAnimalsAmount;
         if (deadAnimalsAmount > 0) {
-            StatisticsPanel.averageLifeSpan.put(days, lifeSpanSum / deadAnimalsAmount);
             return (double) lifeSpanSum / deadAnimalsAmount;
         } else {
-            StatisticsPanel.averageLifeSpan.put(days, 0);
             return 0;
         }
     }
 
-    public double getAverageChildrenAmount(AbstractWorldMap map) {
+    public double getAverageChildrenAmount() {
         int childrenAmount = 0;
-        int livingAnimals = this.getAllAnimalsNumber(map);
+        int livingAnimals = this.getAllAnimalsNumber();
         for (HashMap.Entry<Vector2d, LinkedList<Animal>> entry : map.animals.entrySet()) {
             if (entry.getValue() != null) {
                 for (Animal animal : entry.getValue()) {
@@ -129,16 +122,14 @@ public class SimulationEngine implements IEngine, Runnable {
             }
         }
         if (livingAnimals > 0) {
-            StatisticsPanel.averageChildrenAmount.put(days, childrenAmount / livingAnimals);
             return (double) childrenAmount / livingAnimals;
         } else {
-            StatisticsPanel.averageChildrenAmount.put(days, 0);
             return 0;
         }
     }
 
-    public int getDays() {
-        return this.days;
+    public int getCurrentEpoch() {
+        return this.currentEpoch;
     }
 
     public String getGenotypeDominant(AbstractWorldMap map) {
@@ -157,8 +148,8 @@ public class SimulationEngine implements IEngine, Runnable {
     // STATISTICS WRITING
 
     public String getNewLine() {
-        return this.getDays() + ", " + this.getAllAnimalsNumber(this.map) + ", " + this.getAllPlantsNumber(this.map) + ", "
-                + this.getAverageLifeSpan(this.map) + ", " + this.getAverageEnergyLevel(this.map) + ", " + this.getAverageChildrenAmount(this.map);
+        return this.getCurrentEpoch() + ", " + this.getAllAnimalsNumber() + ", " + this.getAllPlantsNumber() + ", "
+                + this.getAverageLifeSpan() + ", " + this.getAverageEnergyLevel() + ", " + this.getAverageChildrenAmount();
     }
 
     public String getNewAverageDataLine() {
@@ -167,11 +158,11 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public void updateAverageData() {
-        averageData.set(0, (double) this.getAllAnimalsNumber(this.map) / days);
-        averageData.set(1, (double) this.getAllPlantsNumber(this.map) / days);
-        averageData.set(2, this.getAverageLifeSpan(this.map) / days);
-        averageData.set(3, this.getAverageEnergyLevel(this.map) / days);
-        averageData.set(4, this.getAverageChildrenAmount(this.map) / days);
+        averageData.set(0, currentEpoch == 0 ? (double) this.getAllAnimalsNumber() : (double) this.getAllAnimalsNumber() / currentEpoch);
+        averageData.set(1, currentEpoch == 0 ? (double) this.getAllPlantsNumber() : (double) this.getAllPlantsNumber() / currentEpoch);
+        averageData.set(2, currentEpoch == 0 ? this.getAverageLifeSpan() : this.getAverageLifeSpan() / currentEpoch);
+        averageData.set(3, currentEpoch == 0 ? this.getAverageEnergyLevel() : this.getAverageEnergyLevel() / currentEpoch);
+        averageData.set(4, currentEpoch == 0 ? this.getAverageChildrenAmount() : this.getAverageChildrenAmount() / currentEpoch);
 
     }
 
@@ -185,24 +176,28 @@ public class SimulationEngine implements IEngine, Runnable {
         }
 
         while (this.isON) {
-                map.removeDeadBodies();
-                this.doMagicTrick();
-                map.moving();
-                for (IPositionChangeObserver animalMoveObserver : this.observers)
-                    animalMoveObserver.positionChanged(this.grid, this.map, this, this.statistics);
-                map.eating();
-                map.reproduction();
-                map.addNewPlants();
-                map.newDay();
-                try {
-                    Thread.sleep(moveDelay);
-                } catch (InterruptedException e) {
-                    System.out.println("Simulation interrupted");
-                }
-                days++;
-                this.updateAverageData();
-                statisticsConverter.addToStatistics(this.getNewLine());
-                Platform.runLater(statisticsPanel::prepareData);
+            map.removeDeadBodies();
+            this.doMagicTrick();
+            map.moving();
+            for (IPositionChangeObserver animalMoveObserver : this.observers)
+                animalMoveObserver.positionChanged(this.grid, this.map, this, this.statistics);
+            map.eating();
+            map.reproduction();
+            map.addNewPlants();
+            map.newDay();
+            try {
+                Thread.sleep(moveDelay);
+            } catch (InterruptedException e) {
+                System.out.println("Simulation interrupted");
+            }
+            currentEpoch++;
+            this.updateAverageData();
+            statisticsConverter.addToStatistics(this.getNewLine());
+            System.out.println(this.currentEpoch + " " + this.getNewLine());
+            Platform.runLater(() -> {
+                statisticsPanel.prepareData(currentEpoch, getAllAnimalsNumber(), (int)getAverageChildrenAmount(),
+                        getAllPlantsNumber(), getAverageEnergyLevel(), getAverageLifeSpan());
+            });
         }
     }
 

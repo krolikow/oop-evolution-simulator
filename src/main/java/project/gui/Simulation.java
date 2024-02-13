@@ -46,8 +46,8 @@ public class Simulation extends Application implements IPositionChangeObserver {
     @Override
     public void start(Stage primaryStage) {
         try {
-            this.statisticsPanelBMap = new StatisticsPanel();
-            this.statisticsPanelUBMap = new StatisticsPanel();
+            this.statisticsPanelBMap = new StatisticsPanel(initialNumberOfAnimals,0,0,startEnergy,0);
+            this.statisticsPanelUBMap = new StatisticsPanel(initialNumberOfAnimals,0,0,startEnergy,0);
             this.boundedMap = new BoundedMap(height, width, moveEnergy, plantEnergy, startEnergy, jungleRatio, initialNumberOfAnimals);
             this.unboundedMap = new UnBoundedMap(height, width, moveEnergy, plantEnergy, startEnergy, jungleRatio, initialNumberOfAnimals);
             this.engineBMap = new SimulationEngine(this.boundedMap, 300, true, statisticsPanelBMap, gridB, statisticsBoxBoundedMap);
@@ -206,12 +206,12 @@ public class Simulation extends Application implements IPositionChangeObserver {
     }
 
     public void updateStatistics(SimulationEngine engine, AbstractWorldMap map, VBox box) {
-        Label daysLabel = new Label("Epochs number: " + engine.getDays());
-        Label animalNumberLabel = new Label("Animals number: " + engine.getAllAnimalsNumber(map));
-        Label plantNumberLabel = new Label("Plant number: " + engine.getAllPlantsNumber(map));
-        Label averageChildrenAmountNumberLabel = new Label("Average children amount: " + engine.getAverageChildrenAmount(map));
-        Label averageLifeSpanNumberLabel = new Label("Average life span: " + engine.getAverageLifeSpan(map));
-        Label averageEnergyLevelNumberLabel = new Label("Average energy level: " + engine.getAverageEnergyLevel(map));
+        Label daysLabel = new Label("Epochs number: " + engine.getCurrentEpoch());
+        Label animalNumberLabel = new Label("Animals number: " + engine.getAllAnimalsNumber());
+        Label plantNumberLabel = new Label("Plant number: " + engine.getAllPlantsNumber());
+        Label averageChildrenAmountNumberLabel = new Label("Average children amount: " + engine.getAverageChildrenAmount());
+        Label averageLifeSpanNumberLabel = new Label("Average life span: " + engine.getAverageLifeSpan());
+        Label averageEnergyLevelNumberLabel = new Label("Average energy level: " + engine.getAverageEnergyLevel());
         Label genotypeDominantLabel = new Label("Genotype dominant: " + engine.getGenotypeDominant(map));
         Label numberOfMagicTricksLeft = new Label("There are " + engine.getMagicTricksNumber() + " magic tricks left." );
         box.getChildren().addAll(daysLabel, animalNumberLabel, plantNumberLabel, averageChildrenAmountNumberLabel,
