@@ -36,7 +36,7 @@ public class GuiElementBox {
     public VBox setImages(AbstractWorldMapElement element) {
 
         ImageView elementView;
-        Label elementLabel;
+        Label elementLabel = new Label("");
 
         if (element instanceof Animal) {
             elementView = switch (((Animal)element).getDirection()) {
@@ -52,7 +52,6 @@ public class GuiElementBox {
 
         } else {
             elementView = new ImageView(imageCarrot);
-            elementLabel = new Label("");
         }
         elementView.setFitWidth(30);
         elementView.setFitHeight(30);

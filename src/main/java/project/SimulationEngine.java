@@ -11,7 +11,9 @@ import java.util.*;
 public class SimulationEngine implements IEngine, Runnable {
     private final AbstractWorldMap map;
     private final List<IPositionChangeObserver> observers = new ArrayList<>();
-    private int moveDelay, magicTricks, days = 0;
+    private final int moveDelay;
+    private int magicTricks;
+    private int days = 0;
     private boolean isON, isMagic;
     private final StatisticsPanel statisticsPanel;
     private final GridPane grid;
@@ -109,7 +111,7 @@ public class SimulationEngine implements IEngine, Runnable {
         int deadAnimalsAmount = map.deadAnimalsAmount;
         if (deadAnimalsAmount > 0) {
             StatisticsPanel.averageLifeSpan.put(days, lifeSpanSum / deadAnimalsAmount);
-            return lifeSpanSum / deadAnimalsAmount;
+            return (double) lifeSpanSum / deadAnimalsAmount;
         } else {
             StatisticsPanel.averageLifeSpan.put(days, 0);
             return 0;
@@ -128,7 +130,7 @@ public class SimulationEngine implements IEngine, Runnable {
         }
         if (livingAnimals > 0) {
             StatisticsPanel.averageChildrenAmount.put(days, childrenAmount / livingAnimals);
-            return childrenAmount / livingAnimals;
+            return (double) childrenAmount / livingAnimals;
         } else {
             StatisticsPanel.averageChildrenAmount.put(days, 0);
             return 0;
@@ -140,7 +142,8 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public String getGenotypeDominant(AbstractWorldMap map) {
-        ArrayList<Integer> mostCommonGenotype = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+        ArrayList<Integer> mostCommonGenotype = new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
         int frequency = -1;
         for (Map.Entry<ArrayList<Integer>, Integer> entity : map.allGenotypes.entrySet()) {
             if (entity.getValue() > frequency) {
@@ -181,8 +184,7 @@ public class SimulationEngine implements IEngine, Runnable {
             System.out.println("Error has occured: " + ex);
         }
 
-        while (true) {
-            if (this.isON) {
+        while (this.isON) {
                 map.removeDeadBodies();
                 this.doMagicTrick();
                 map.moving();
@@ -200,11 +202,7 @@ public class SimulationEngine implements IEngine, Runnable {
                 days++;
                 this.updateAverageData();
                 statisticsConverter.addToStatistics(this.getNewLine());
-                System.out.println(this.getMagicTricksNumber());
-                Platform.runLater(() -> {
-                    statisticsPanel.prepareData();
-                });
-            }
+                Platform.runLater(statisticsPanel::prepareData);
         }
     }
 
