@@ -207,11 +207,11 @@ public class Simulation extends Application implements IPositionChangeObserver {
 
     public void updateStatistics(SimulationEngine engine, AbstractWorldMap map, VBox box) {
         Label daysLabel = new Label("Epochs number: " + engine.getCurrentEpoch());
-        Label animalNumberLabel = new Label("Animals number: " + engine.getAllAnimalsNumber());
-        Label plantNumberLabel = new Label("Plant number: " + engine.getAllPlantsNumber());
-        Label averageChildrenAmountNumberLabel = new Label("Average children amount: " + engine.getAverageChildrenAmount());
+        Label animalNumberLabel = new Label("Animals number: " + engine.getAnimalsNumber());
+        Label plantNumberLabel = new Label("Plant number: " + engine.getPlantsNumber());
+        Label averageChildrenAmountNumberLabel = new Label("Average children amount: " + engine.getAverageChildrenNumber(engine.getAnimalsNumber()));
         Label averageLifeSpanNumberLabel = new Label("Average life span: " + engine.getAverageLifeSpan());
-        Label averageEnergyLevelNumberLabel = new Label("Average energy level: " + engine.getAverageEnergyLevel());
+        Label averageEnergyLevelNumberLabel = new Label("Average energy level: " + engine.getAverageEnergyLevel(engine.getAnimalsNumber()));
         Label genotypeDominantLabel = new Label("Genotype dominant: " + engine.getGenotypeDominant(map));
         Label numberOfMagicTricksLeft = new Label("There are " + engine.getMagicTricksNumber() + " magic tricks left." );
         box.getChildren().addAll(daysLabel, animalNumberLabel, plantNumberLabel, averageChildrenAmountNumberLabel,
