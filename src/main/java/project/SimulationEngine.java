@@ -72,10 +72,10 @@ public class SimulationEngine implements IEngine, Runnable {
     public int getAnimalsNumber() {
         int result = 0;
         for (Vector2d position : map.animals.keySet()) {
-                LinkedList<Animal> animalsAtField = map.animals.get(position);
-                if (animalsAtField != null) {
-                    result += animalsAtField.size();
-                }
+            LinkedList<Animal> animalsAtField = map.animals.get(position);
+            if (animalsAtField != null) {
+                result += animalsAtField.size();
+            }
         }
         return result;
     }
@@ -85,47 +85,31 @@ public class SimulationEngine implements IEngine, Runnable {
     }
 
     public double getAverageEnergyLevel(int animalsNumber) {
+        if (animalsNumber == 0) return 0;
         int energySum = 0;
-        for (HashMap.Entry<Vector2d, LinkedList<Animal>> entry : map.animals.entrySet()) {
-            if (entry.getValue() != null) {
-                for (Animal animal : entry.getValue()) {
-                    energySum += animal.getEnergy();
-                }
-
-            }
+        List<Animal> animals = map.animalsList;
+        for (var animal : animals) {
+            energySum += animal.getEnergy();
         }
-        if (animalsNumber > 0) {
-            return (double) energySum / animalsNumber;
-        } else {
-            return 0;
-        }
-
+        return (double) energySum / animalsNumber;
     }
+
 
     public double getAverageLifeSpan() {
         int lifeSpanSum = map.lifeSpanSum;
         int deadAnimalsAmount = map.deadAnimalsAmount;
-        if (deadAnimalsAmount > 0) {
-            return (double) lifeSpanSum / deadAnimalsAmount;
-        } else {
-            return 0;
-        }
+        if (deadAnimalsAmount == 0) return 0;
+        return (double) lifeSpanSum / deadAnimalsAmount;
     }
 
     public double getAverageChildrenNumber(int animalsNumber) {
+        if (animalsNumber == 0) return 0;
         int childrenAmount = 0;
-        for (HashMap.Entry<Vector2d, LinkedList<Animal>> entry : map.animals.entrySet()) {
-            if (entry.getValue() != null) {
-                for (Animal animal : entry.getValue()) {
-                    childrenAmount += animal.getChildrenAmount();
-                }
-            }
+        List<Animal> animals = map.animalsList;
+        for (var animal : animals) {
+            childrenAmount += animal.getChildrenAmount();
         }
-        if (animalsNumber > 0) {
-            return (double) childrenAmount / animalsNumber;
-        } else {
-            return 0;
-        }
+        return (double) childrenAmount / animalsNumber;
     }
 
     public int getCurrentEpoch() {
@@ -167,7 +151,7 @@ public class SimulationEngine implements IEngine, Runnable {
         averageData.set(1, currentEpoch == 0 ? plantsNumber : plantsNumber / currentEpoch);
         averageData.set(2, currentEpoch == 0 ? averageLifeSpan : averageLifeSpan / currentEpoch);
         averageData.set(3, currentEpoch == 0 ? averageEnergyLevel : averageEnergyLevel / currentEpoch);
-        averageData.set(4, currentEpoch == 0 ? averageChildrenNumber :averageChildrenNumber / currentEpoch);
+        averageData.set(4, currentEpoch == 0 ? averageChildrenNumber : averageChildrenNumber / currentEpoch);
 
     }
 
