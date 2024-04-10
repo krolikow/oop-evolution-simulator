@@ -29,6 +29,7 @@ public class StatisticsPanel extends Application {
     }
 
     @Override
+    @SuppressWarnings({"rawtypes","unchecked"})
     public void start(Stage primaryStage) {
         NumberAxis x = new NumberAxis();
         NumberAxis y = new NumberAxis();
