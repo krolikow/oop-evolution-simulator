@@ -19,3 +19,9 @@ It is possible to set custom parameters at the beginning of the simulation:
 It's also possible to view statistics such as average children number, average life span, average energy level or genotype dominant. Statistics can be exported to csv file.
 
 ![statistics](https://github.com/krolikow/oop-evolution-simulator/blob/master/src/main/resources/images/stats.png)
+
+## Stack
+
+* Java 17
+* JavaFX
+* Gradle
